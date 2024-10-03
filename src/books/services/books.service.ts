@@ -2,8 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from '../entities/book.entity';
 import { Repository } from 'typeorm';
-import { CreateBookDto } from '../dto/create-book.dto';
-import { log } from 'console';
+import { FilterBooksDto, CreateBookDto  } from '../dto';
 
 @Injectable()
 export class BooksService {
@@ -11,9 +10,32 @@ export class BooksService {
         @InjectRepository(Book) private readonly bookRepository: Repository<Book>
     ){}
 
-    async getAll(){
-        return await this.bookRepository.find()
+
+
+    async getAll(): Promise<Book[]> {
+        try {
+            return await this.bookRepository.find()
+        } catch (error) {
+            throw new HttpException("Error foundind books", HttpStatus.BAD_REQUEST)
+        } 
     }
+
+    async findBooks(filterBooksDto: FilterBooksDto): Promise<Book[]>{
+        const queryBuilder = this.bookRepository.createQueryBuilder('book');
+        const {publication_date, author, genre_id, title} = filterBooksDto;
+
+        if(publication_date){
+            queryBuilder.andWhere('book.publication_date = :publication_date', { publication_date });
+        }
+        return await queryBuilder.getMany();    
+    }
+
+
+
+
+
+
+
 
     async create(createBookDto: CreateBookDto): Promise<{ message: string; book: Book}> {
         try {
