@@ -1,19 +1,24 @@
-import { IsNotEmpty, IsDate, IsString, IsNumber } from "class-validator";
+import { IsNotEmpty, IsDate, IsString, IsNumber, Matches } from "class-validator";
+import { Type, plainToClass  } from 'class-transformer';
+
+
 
 export class CreateBookDto {
     @IsNotEmpty()
+    @Type(() => Date)
     @IsDate()
-    publication_date: Date
+    //@Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'La fecha debe estar en el formato YYYY-MM-DD' })
+    publication_date: Date;
 
     @IsNotEmpty()
     @IsString()
-    title: string
+    title: string;
 
     @IsNotEmpty()
     @IsString()
-    author: string
+    author: string;
 
     @IsNotEmpty()
     @IsNumber()
-    gender_id: number
+    gender_id: number;
 }
