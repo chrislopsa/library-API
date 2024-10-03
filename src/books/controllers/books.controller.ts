@@ -6,15 +6,15 @@ import { CreateBookDto } from '../dto/create-book.dto';
 
 @Controller('books')
 export class BooksController {
-    constructor(private readonly bookService: BooksService){}
+    constructor(private readonly booksService: BooksService){}
 
     @Get()
     async findAll(): Promise<Book[]>{
-        return await this.bookService.getAll();
+        return await this.booksService.getAll();
     }
 
     @Post()
-    async create(@Body() createBookData: CreateBookDto ){
-        return await this.bookService.create(createBookData)
+    async create(@Body() createBookDto: CreateBookDto ): Promise<{ message: string; book: Book}> {
+        return await this.booksService.create(createBookDto);
     } 
 }
