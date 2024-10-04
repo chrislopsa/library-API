@@ -17,5 +17,5 @@ export class FilterBooksDto {
 
     @IsOptional()
     @IsNumber()
-    genre_id?: number; 
+    gender_id?: number; 
 }
