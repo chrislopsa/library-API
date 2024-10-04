@@ -9,7 +9,7 @@ export class BooksController {
     constructor(private readonly booksService: BooksService){}
 
     @Post('filter')
-    async filterBooks(@Body() filterBooks: FilterBooksDto): Promise<Book[]>{
+    async filterBooks(@Body() filterBooks: FilterBooksDto): Promise<Book[] | { message: string }>{
         return await this.booksService.findBooks(filterBooks);
     }
 
