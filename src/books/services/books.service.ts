@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from '../entities/book.entity';
 import { Repository } from 'typeorm';
-import { FilterBooksDto, CreateBookDto } from '../dto';
+import { FilterBooksDto, CreateBookDto, UpdateBookDto } from '../dto';
 import { isUUID } from 'validator';
 import { Injectable,
      HttpException, 
@@ -15,7 +15,7 @@ export class BooksService {
         @InjectRepository(Book) private readonly bookRepository: Repository<Book>
     ){}
 
-    async findOne(id: string){
+    async findOne(id: string): Promise<Book>{
         try {
             if(!isUUID(id)){
                 throw new BadRequestException(`ID ${id} is not a valid uuid`);
@@ -41,11 +41,6 @@ export class BooksService {
             throw new HttpException('internal server error', HttpStatus.BAD_REQUEST);
         }
     }
-
-
-
-
-
 
     async getAll(): Promise<Book[]> {
         try {
@@ -109,6 +104,22 @@ export class BooksService {
             }
         } catch (error) {
             throw new HttpException('Error creating user', HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    async update(id: string, updateDto: UpdateBookDto): Promise<{ message: string, book: Book }> {
+        try {
+            const book: Book = await this.findOne(id);
+            const newBookData: Book = Object.assign(book, updateDto); 
+            const updatedBook: Book = await this.bookRepository.save(newBookData); 
+
+            return{
+                message: `Book information with ID ${id}, successfully updated`,
+                book: updatedBook
+            };
+
+        } catch (error) {  
+            throw new HttpException(error.message, error.status);
         }
     }
 }

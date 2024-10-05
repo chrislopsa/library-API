@@ -1,14 +1,14 @@
-import { Body, Controller, Get, Post, Param} from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Put} from '@nestjs/common';
 import { BooksService } from '../services/books.service';
 import { Book } from '../entities/book.entity';
-import { CreateBookDto, FilterBooksDto } from '../dto';
+import { CreateBookDto, FilterBooksDto, UpdateBookDto } from '../dto';
 
 @Controller('books')
 export class BooksController {
     constructor(private readonly booksService: BooksService){}
 
     @Get(':id')
-    async findOne(@Param('id') id: string){
+    async findOne(@Param('id') id: string): Promise<Book>{
         return await this.booksService.findOne(id);
     } 
 
@@ -21,4 +21,9 @@ export class BooksController {
     async create(@Body() createBookDto: CreateBookDto ): Promise<{ message: string; book: Book}> {
         return await this.booksService.create(createBookDto);
     } 
+
+    @Put(':id')
+    async update(@Param('id') id: string, @Body() updateDto: UpdateBookDto): Promise<{ message: string, book: Book }>{
+        return this.booksService.update(id, updateDto);
+    }
 }
