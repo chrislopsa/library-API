@@ -1,14 +1,49 @@
-import { Injectable, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Book } from '../entities/book.entity';
 import { Repository } from 'typeorm';
-import { FilterBooksDto, CreateBookDto  } from '../dto';
+import { FilterBooksDto, CreateBookDto } from '../dto';
+import { isUUID } from 'validator';
+import { Injectable,
+     HttpException, 
+     HttpStatus, 
+     NotFoundException, 
+     BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class BooksService {
     constructor(
         @InjectRepository(Book) private readonly bookRepository: Repository<Book>
     ){}
+
+    async findOne(id: string){
+        try {
+            if(!isUUID(id)){
+                throw new BadRequestException(`ID ${id} is not a valid uuid`);
+            }
+            const book: Book = await this.bookRepository.findOne({ where: {id} });
+
+            if(!book){
+                throw new NotFoundException(`book with ID ${id} NOT FOUND`);
+            }
+    
+            return book;
+            
+           
+        } catch (error) {
+
+            if(error instanceof NotFoundException){
+                throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+            }
+            if(error instanceof BadRequestException){
+                throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+            }
+
+            throw new HttpException('internal server error', HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+
 
 
 
